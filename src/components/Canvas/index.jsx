@@ -1,5 +1,5 @@
-import React, {useRef, useEffect} from 'react';
-import '../../app.css';
+import React from 'react';
+import '../../assets/app.css';
 import { useCanvas } from '../../contexts/CanvasContext';
 const Canvas = (props) => {
     const canvasRef = useCanvas();  
