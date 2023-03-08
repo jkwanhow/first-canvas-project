@@ -17,7 +17,7 @@ export default function Draw(){
     }
 
     const handleKeyPress = (e) => {
-        dispatchKeyAction(e.keyCode, canvasRef)
+        keypressReducer(e.keyCode, canvasRef)
     }
    
     // Add listeners
@@ -45,7 +45,7 @@ export default function Draw(){
     )
 }
 
-const dispatchKeyAction = (keyCode, canvasRef) => {
+const keypressReducer = (keyCode, canvasRef) => {
     // Check which was was pressed using ASCII value
     switch (keyCode) {
         case 99: {
