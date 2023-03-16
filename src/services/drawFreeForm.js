@@ -1,9 +1,13 @@
-export function initialiseFreeFromDraw(position, canvasRef){
-    console.log('initialise free form')
+export function selectFreeFormDraw(canvasRef){
     const canvas = canvasRef.current;
     const ctx = canvas.ctx;
     ctx.lineWidth = 10;
     ctx.strokeStyle = "black";
+}
+
+export function initialiseFreeFromDraw(position, canvasRef){
+    const canvas = canvasRef.current;
+    const ctx = canvas.ctx;
     ctx.beginPath();
     ctx.moveTo(position.x, position.y)
 }
