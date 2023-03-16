@@ -3,17 +3,34 @@ import { useCanvas } from '../../contexts/CanvasContext';
 import drawRectangle from '../../services/drawRectangle';
 import clearBoard from '../../services/clearBoard';
 import getCanvasMousePos from '../../services/getCanvasMousePos';
+import { initialiseFreeFromDraw, performFreeFromAction } from '../../services/drawFreeForm';
 
 export default function Draw(){
     const canvasRef = useCanvas();
-    const [mousePosState, setMousePosState] = useState({});
-    const mousePos = useRef(null);
+    //const [mousePosState, setMousePosState] = useState({});
+    const mouseStatus = useRef(null);
     const handleMouseMove = (e) => {
-        mousePos.current = { x: e.clientX, y: e.clientY };
+        //console.log(`${e.clientX}, ${e.clientY}`)
+        mouseStatus.current = {...mouseStatus.current, position: {x: e.clientX, y: e.clientY} };
+        if(mouseStatus.current.isDown){
+            performFreeFromAction(mouseStatus.current.position, canvasRef);
+            //drawRectangle(getCanvasMousePos(canvasRef, mouseStatus.current.position), canvasRef);
+        }
     }
-    const updateMouseState = () => {
+    const handleMouseDown = () => {
         console.log('triggered')
-        setMousePosState(mousePos.current);
+        mouseStatus.current = { ...mouseStatus.current, isDown: true };
+        initialiseFreeFromDraw(mouseStatus.current.position, canvasRef);
+        //drawRectangle(getCanvasMousePos(canvasRef, mouseStatus.current.position), canvasRef);
+        
+        //setMousePosState(mousePos.current);
+    }
+
+    const handleMouseUp = () => {
+        console.log("mouse up clear interval");
+        //clearInterval(mouseStatus.current.intervalTaskId);
+        mouseStatus.current = { ...mouseStatus.current, isDown: false}
+        canvasRef.current.ctx.closePath();
     }
 
     const handleKeyPress = (e) => {
@@ -23,23 +40,19 @@ export default function Draw(){
     // Add listeners
     useEffect(() => {
         window.addEventListener('mousemove', handleMouseMove);
-        document.addEventListener("mousedown", updateMouseState);
+        document.addEventListener("mouseup", handleMouseUp);
+        document.addEventListener("mousedown", handleMouseDown);
         document.addEventListener("keypress", handleKeyPress)
     }, [])
     // Add rectangle on click
-    useEffect(() => {
-        if(!objectIsEmpty(mousePosState)){
-            drawRectangle(getCanvasMousePos(canvasRef, mousePos.current), canvasRef);
-        }
-    }, [mousePosState])
-    
+
 
     return(
     <>
     <div>click to update state of mouse position</div>
     <div>clear the canvas with 'c'</div>
     <div>
-        Mouse is at x={mousePosState.x} y={mousePosState.y}
+        
     </div>
     </>
     )

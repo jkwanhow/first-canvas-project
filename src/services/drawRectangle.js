@@ -1,6 +1,6 @@
 export default function drawRectangle(position, canvasRef){
     const canvas = canvasRef.current;
-    const context = canvas.getContext('2d');
-    context.fillStyle = '#000000'
-    context.fillRect(position.x, position.y, 10, 10)
+    const ctx = canvas.ctx
+    ctx.fillStyle = '#000000'
+    ctx.fillRect(position.x, position.y, 10, 10)
 }
