@@ -1,3 +1,9 @@
 #canvas {
     outline: 1px solid black;
 }
+
+#preview-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+}

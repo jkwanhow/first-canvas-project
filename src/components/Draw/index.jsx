@@ -1,43 +1,39 @@
 import React, {useEffect, useRef, useState} from 'react';
 import { useCanvas } from '../../contexts/CanvasContext';
-import drawRectangle from '../../services/drawRectangle';
-import clearBoard from '../../services/clearBoard';
+import {selectRectangle, initialiseRectangle, performRectangleAction, drawRectangle} from '../../services/drawRectangle';
+import { clearBoard } from '../../services/clearBoard';
 import getCanvasMousePos from '../../services/getCanvasMousePos';
 import { initialiseFreeFromDraw, performFreeFromAction, selectFreeFormDraw } from '../../services/drawFreeForm';
 
 export default function Draw(){
-    const canvasRef = useCanvas();
-    //const [mousePosState, setMousePosState] = useState({});
+    const {canvas, preview} = useCanvas();
+
     const mouseStatus = useRef(null);
     const handleMouseMove = (e) => {
-        //console.log(`${e.clientX}, ${e.clientY}`)
+
         mouseStatus.current = {...mouseStatus.current, position: {x: e.clientX, y: e.clientY} };
         if(mouseStatus.current.isDown){
-            canvasRef.current.performAction(mouseStatus.current.position, canvasRef);
-            //performFreeFromAction(mouseStatus.current.position, canvasRef);
-            //drawRectangle(getCanvasMousePos(canvasRef, mouseStatus.current.position), canvasRef);
+            canvas.current.performAction(mouseStatus.current.position, canvas, preview);
+
         }
     }
     const handleMouseDown = () => {
         console.log('triggered')
         mouseStatus.current = { ...mouseStatus.current, isDown: true };
-        canvasRef.current.initialiseAction(mouseStatus.current.position, canvasRef);
-        //initialiseFreeFromDraw(mouseStatus.current.position, canvasRef);
-        //drawRectangle(getCanvasMousePos(canvasRef, mouseStatus.current.position), canvasRef);
-        
-        //setMousePosState(mousePos.current);
+        canvas.current.initialiseAction(mouseStatus.current.position, canvas, preview);
+ 
     }
 
     const handleMouseUp = () => {
         console.log("mouse up clear interval");
-        //clearInterval(mouseStatus.current.intervalTaskId);
+
         mouseStatus.current = { ...mouseStatus.current, isDown: false}
-        canvasRef.current.endAction(mouseStatus.current.position, canvasRef);
-        //canvasRef.current.ctx.closePath();
+        canvas.current.endAction(mouseStatus.current.position, canvas, preview);
+
     }
 
     const handleKeyPress = (e) => {
-        dispatchKeypressAction(e.keyCode, canvasRef)
+        dispatchKeypressAction(e.keyCode, canvas, preview)
     }
    
     // Add listeners
@@ -46,8 +42,15 @@ export default function Draw(){
         document.addEventListener("mouseup", handleMouseUp);
         document.addEventListener("mousedown", handleMouseDown);
         document.addEventListener("keypress", handleKeyPress)
+
+        return(() => {
+            window.removeEventListener("mousemove", handleMouseMove);
+            document.removeEventListener("mouseup", handleMouseUp);
+            document.removeEventListener("mosedown", handleMouseDown);
+            document.removeEventListener("keypress", handleKeyPress);
+        })
     }, [])
-    // Add rectangle on click
+
 
 
     return(
@@ -57,13 +60,16 @@ export default function Draw(){
         Press 'f' for pencil/draw freeform
     </div>
     <div>
+        Press 'r' for the rectangle draw tool
+    </div>
+    <div>
         Press 'n' to have no tools selected
     </div>
     </>
     )
 }
 
-const dispatchKeypressAction = (keyCode, canvasRef) => {
+const dispatchKeypressAction = (keyCode, canvasRef, previewRef) => {
     // Check which was was pressed using ASCII value
     switch (keyCode) {
         case 99: {
@@ -84,6 +90,14 @@ const dispatchKeypressAction = (keyCode, canvasRef) => {
             canvasRef.current['initialiseAction'] = (position, canvasRef) => { console.log('intial action intialiser'); };
             canvasRef.current['performAction'] = (position, canvasRef) => { console.log('performing action'); };
             canvasRef.current['endAction'] = (position, canvasRef) => { console.log('action ending'); };
+            break;
+        }
+        case 114: {
+            selectRectangle(canvasRef);
+            selectRectangle(previewRef);
+            canvasRef.current['initialiseAction'] = (position, canvasRef) => { initialiseRectangle(position, canvasRef); };
+            canvasRef.current['performAction'] = (position, canvasRef, previewRef) => { performRectangleAction(position, canvasRef, previewRef); };
+            canvasRef.current['endAction'] = (position, canvasRef, previewRef) => { drawRectangle(position, canvasRef, previewRef); };
             break;
         }
         default: {
