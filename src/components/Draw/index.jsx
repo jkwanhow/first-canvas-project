@@ -2,7 +2,6 @@ import React, {useEffect, useRef, useState} from 'react';
 import { useCanvas } from '../../contexts/CanvasContext';
 import {selectRectangle, initialiseRectangle, performRectangleAction, drawRectangle} from '../../services/drawRectangle';
 import { clearBoard } from '../../services/clearBoard';
-import getCanvasMousePos from '../../services/getCanvasMousePos';
 import { initialiseFreeFromDraw, performFreeFromAction, selectFreeFormDraw } from '../../services/drawFreeForm';
 
 export default function Draw(){
@@ -70,12 +69,10 @@ const dispatchKeypressAction = (keyCode, actionsRef, canvasRef, previewRef) => {
     // Check which was was pressed using ASCII value
     switch (keyCode) {
         case 99: {
-            console.log("c was pressed");
             clearBoard(canvasRef);
             break;
         }
         case 102: {
-            console.log("f key was pressed");
             selectFreeFormDraw(canvasRef);
             actionsRef.current.initialiseAction = (position, ref) => { initialiseFreeFromDraw(position, ref)};
             actionsRef.current.performAction = (position, ref) => { performFreeFromAction(position, ref)};
@@ -83,7 +80,6 @@ const dispatchKeypressAction = (keyCode, actionsRef, canvasRef, previewRef) => {
             break;
         }
         case 110: {
-            console.log("f key was pressed");
             actionsRef.current['initialiseAction'] = (position, canvasRef) => { console.log('intial action intialiser'); };
             actionsRef.current['performAction'] = (position, canvasRef) => { console.log('performing action'); };
             actionsRef.current['endAction'] = (position, canvasRef) => { console.log('action ending'); };
